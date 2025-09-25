@@ -44,3 +44,68 @@ out of the box.
 Just Add New... > Project, import the Git repository, and off you go.
 Note that Vercel's Hobby plan means your private repository needs to be
 in your personal GitHub account, not the organizational account.
+
+## County Data API
+
+### Endpoint
+
+- URL: `/county_data`
+- Method: `POST`
+- Content-Type: `application/json`
+
+### Required JSON body
+
+- `zip`: 5-digit ZIP code (string)
+- `measure_name`: One of the following strings:
+  - Violent crime rate
+  - Unemployment
+  - Children in poverty
+  - Diabetic screening
+  - Mammography screening
+  - Preventable hospital stays
+  - Uninsured
+  - Sexually transmitted infections
+  - Physical inactivity
+  - Adult obesity
+  - Premature Death
+  - Daily fine particulate matter
+
+### Special behavior
+
+- If the request JSON includes `{"coffee":"teapot"}`, the API returns HTTP 418.
+
+### Responses
+
+- 200: JSON array of matching county records for the given `zip` and `measure_name`
+- 400: Bad request (missing/invalid `zip` or `measure_name`, or non-JSON)
+- 404: Not found (no matching data)
+- 418: I'm a teapot (when `coffee=teapot` is supplied)
+
+### Examples
+
+Successful query:
+
+```bash
+curl -s -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"zip":"02138","measure_name":"Adult obesity"}' \
+  http://localhost:5000/county_data | jq
+```
+
+Missing fields (400):
+
+```bash
+curl -s -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"zip":"02138"}' \
+  http://localhost:5000/county_data
+```
+
+Teapot (418):
+
+```bash
+curl -s -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"coffee":"teapot","zip":"02138","measure_name":"Adult obesity"}' \
+  http://localhost:5000/county_data
+```
