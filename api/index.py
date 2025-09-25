@@ -172,7 +172,8 @@ def county_data():
                 chr.fipscode
             FROM county_health_rankings AS chr
             JOIN zip_county AS zc
-              ON zc.county_code = chr.county_code
+              ON TRIM(zc.county_code) = TRIM(chr.fipscode)
+             AND zc.state_abbreviation = chr.state
             WHERE zc.zip = ? AND chr.measure_name = ?
             """
         )
